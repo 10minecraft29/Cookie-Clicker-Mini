@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ultimate Cookie Clicker Mini with Prestige</title>
+<title>Cookie Clicker Mini</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -109,11 +109,36 @@
     70% { opacity: 1; }
     100% { opacity: 0; transform: translateX(200%); }
   }
+  /* Fake Ad Modal */
+  #adModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  #adModal button {
+    margin-top: 20px;
+    font-size: 18px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #d2691e;
+    color: white;
+  }
 </style>
 </head>
 <body>
 
-<h1>Ultimate Cookie Clicker Mini with Prestige</h1>
+<h1>Ultimate Cookie Clicker Mini with Prestige & 10s Fake Ads</h1>
 <div id="score">Score: 0</div>
 
 <button class="button" onclick="clickButton(event)">Click Me!</button>
@@ -123,6 +148,14 @@
 
 <div id="prestigeInfo">Prestige Points: 0 | Multiplier: 1.00x</div>
 <button id="prestigeBtn" class="button" onclick="prestige()">Prestige Reset</button>
+
+<button id="watchAdBtn" class="button">Watch Ad for Bonus</button>
+
+<!-- Fake Ad Modal -->
+<div id="adModal">
+  <div>Ad playing... Please wait <span id="adCountdown">10</span> seconds</div>
+  <button onclick="cancelAd()">Cancel</button>
+</div>
 
 <script>
   let score = 0;
@@ -222,7 +255,6 @@
         `Owned: ${item.amount} | Cost: ${item.cost}`;
     });
 
-    // Prestige info and button
     prestigeMultiplier = 1 + (prestigePoints * 0.05);
     pointsPerClick = basePointsPerClick * prestigeMultiplier;
     document.getElementById("prestigeInfo").innerText = 
@@ -241,11 +273,9 @@
   function prestige() {
     if(score < prestigeThreshold) return;
 
-    // Calculate prestige points gained (e.g. floor(score / threshold))
     let gained = Math.floor(score / prestigeThreshold);
     prestigePoints += gained;
 
-    // Reset game progress
     score = 0;
     basePointsPerClick = 1;
     shopItems.forEach(item => {
@@ -253,7 +283,6 @@
       item.cost = item.baseCost;
     });
 
-    // Update multiplier & display
     prestigeMultiplier = 1 + (prestigePoints * 0.05);
     pointsPerClick = basePointsPerClick * prestigeMultiplier;
 
@@ -354,6 +383,42 @@
     document.body.appendChild(ach);
 
     setTimeout(() => ach.remove(), 4500);
+  }
+
+  // ---- Fake Ad System ----
+  const watchAdBtn = document.getElementById('watchAdBtn');
+  const adModal = document.getElementById('adModal');
+  const adCountdownSpan = document.getElementById('adCountdown');
+
+  let adTimer;
+  let adSeconds = 10;
+  let adCooldown = false;
+
+  watchAdBtn.onclick = () => {
+    if(adCooldown) return alert("Please wait before watching another ad.");
+    adSeconds = 10;
+    adCountdownSpan.textContent = adSeconds;
+    adModal.style.display = 'flex';
+    adTimer = setInterval(() => {
+      adSeconds--;
+      adCountdownSpan.textContent = adSeconds;
+      if(adSeconds <= 0){
+        clearInterval(adTimer);
+        adModal.style.display = 'none';
+        // Reward player here
+        let reward = 1000 * prestigeMultiplier;
+        score += reward;
+        createFloatingText("+" + Math.floor(reward) + " Bonus!", window.innerWidth/2, window.innerHeight/2);
+        updateDisplay();
+        adCooldown = true;
+        setTimeout(() => { adCooldown = false; }, 30000); // 30 second cooldown between ads
+      }
+    }, 1000);
+  }
+
+  function cancelAd(){
+    clearInterval(adTimer);
+    adModal.style.display = 'none';
   }
 
   // Intervals
