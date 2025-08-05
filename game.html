@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ultimate Cookie Clicker Mini with Prestige & 10s Fake Ads</title>
+<title>Ultimate Cookie Clicker Mini with Prestige, 10s Fake Ads & Popups</title>
 <style>
   body {
     font-family: Arial, sans-serif;
@@ -134,11 +134,37 @@
     background: #d2691e;
     color: white;
   }
+  /* BonziBuddy Popup */
+  #bonziPopup {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 250px;
+    background: #f0e68c;
+    border: 2px solid #daa520;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+    padding: 15px;
+    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    color: #4b3621;
+    z-index: 1100;
+  }
+  #bonziPopup button {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border: none;
+    background: #daa520;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
-<h1>Ultimate Cookie Clicker Mini with Prestige & 10s Fake Ads</h1>
+<h1>Ultimate Cookie Clicker Mini with Prestige, 10s Fake Ads & Popups</h1>
 <div id="score">Score: 0</div>
 
 <button class="button" onclick="clickButton(event)">Click Me!</button>
@@ -155,6 +181,13 @@
 <div id="adModal">
   <div>Ad playing... Please wait <span id="adCountdown">10</span> seconds</div>
   <button onclick="cancelAd()">Cancel</button>
+</div>
+
+<!-- BonziBuddy Popup -->
+<div id="bonziPopup">
+  Download BonziBuddy Today!
+  <br/>
+  <button onclick="closeBonzi()">Close</button>
 </div>
 
 <script>
@@ -420,6 +453,29 @@
     clearInterval(adTimer);
     adModal.style.display = 'none';
   }
+
+  // ---- BonziBuddy Popup ----
+  const bonziPopup = document.getElementById('bonziPopup');
+
+  function showBonziPopup() {
+    bonziPopup.style.display = 'block';
+  }
+
+  function closeBonzi() {
+    bonziPopup.style.display = 'none';
+    scheduleBonziPopup();
+  }
+
+  function scheduleBonziPopup() {
+    // Random time between 2 to 5 minutes in milliseconds
+    let randomTime = (Math.random() * (5 - 2) + 2) * 60 * 1000;
+    setTimeout(() => {
+      showBonziPopup();
+    }, randomTime);
+  }
+
+  // Start scheduling Bonzi popups
+  scheduleBonziPopup();
 
   // Intervals
   setInterval(autoClick, 1000);
