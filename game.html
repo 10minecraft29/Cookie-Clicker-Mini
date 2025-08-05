@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cookie Clicker Mini Expanded</title>
+<title>Ultimate Cookie Clicker Mini</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -63,11 +63,48 @@
         0% { opacity: 1; transform: translateY(0); }
         100% { opacity: 0; transform: translateY(-50px); }
     }
+    /* Golden Cookie */
+    .golden-cookie {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: gold;
+        border-radius: 50%;
+        border: 3px solid #daa520;
+        cursor: pointer;
+        animation: popIn 0.3s ease-out;
+        box-shadow: 0 0 15px rgba(255,215,0,0.7);
+    }
+    @keyframes popIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+    }
+    /* Achievement Popup */
+    .achievement {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        animation: slideIn 0.5s, fadeOut 4s forwards;
+        font-weight: bold;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(200%); }
+        to { transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+        0% { opacity: 1; }
+        70% { opacity: 1; }
+        100% { opacity: 0; transform: translateX(200%); }
+    }
 </style>
 </head>
 <body>
 
-<h1>Cookie Clicker Mini Expanded</h1>
+<h1>Ultimate Cookie Clicker Mini</h1>
 <div id="score">Score: 0</div>
 
 <button class="button" onclick="clickButton(event)">Click Me!</button>
@@ -78,8 +115,9 @@
 <script>
     let score = 0;
     let pointsPerClick = 1;
+    let goldenCookieActive = false;
 
-    // Dynamic shop array
+    // Dynamic shop items
     let shopItems = [
         { name: "Cursor", baseCost: 15, cost: 15, amount: 0, cps: 0.1 },
         { name: "Grandma", baseCost: 100, cost: 100, amount: 0, cps: 1 },
@@ -89,15 +127,25 @@
         { name: "Mine", baseCost: 50000, cost: 50000, amount: 0, cps: 500 }
     ];
 
-    // Load save
-    if(localStorage.getItem("clickerSaveExpanded")) {
-        let save = JSON.parse(localStorage.getItem("clickerSaveExpanded"));
+    // Achievements
+    let achievements = {
+        firstClick: false,
+        hundredPoints: false,
+        tenGrandmas: false,
+        firstFactory: false,
+        oneMillion: false
+    };
+
+    // Load Save
+    if(localStorage.getItem("ultimateClickerSave")) {
+        let save = JSON.parse(localStorage.getItem("ultimateClickerSave"));
         score = save.score;
         pointsPerClick = save.pointsPerClick;
         shopItems = save.shopItems;
+        achievements = save.achievements || achievements;
     }
 
-    // Build shop UI
+    // Build Shop
     function buildShop() {
         const shopDiv = document.getElementById("shop");
         shopDiv.innerHTML = "";
@@ -117,6 +165,7 @@
     function clickButton(event) {
         score += pointsPerClick;
         createFloatingText("+" + pointsPerClick, event.clientX, event.clientY);
+        checkAchievements();
         updateDisplay();
     }
 
@@ -126,17 +175,18 @@
             score -= item.cost;
             item.amount++;
             item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+            checkAchievements();
             updateDisplay();
         }
     }
 
     function autoClick() {
-        let autoPoints = 0;
-        shopItems.forEach(item => autoPoints += item.amount * item.cps);
+        let autoPoints = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0);
         score += autoPoints;
         if(autoPoints > 0) {
             createFloatingText("+" + autoPoints.toFixed(1), window.innerWidth/2, 100);
         }
+        checkAchievements();
         updateDisplay();
     }
 
@@ -158,9 +208,10 @@
         let save = {
             score: score,
             pointsPerClick: pointsPerClick,
-            shopItems: shopItems
+            shopItems: shopItems,
+            achievements: achievements
         };
-        localStorage.setItem("clickerSaveExpanded", JSON.stringify(save));
+        localStorage.setItem("ultimateClickerSave", JSON.stringify(save));
     }
 
     function createFloatingText(text, x, y) {
@@ -175,10 +226,83 @@
         setTimeout(() => floatText.remove(), 1000);
     }
 
-    // Auto click every second
-    setInterval(autoClick, 1000);
+    // ---- Golden Cookie ----
+    function spawnGoldenCookie() {
+        if (goldenCookieActive) return;
+        const golden = document.createElement("div");
+        golden.className = "golden-cookie";
 
-    // Initialize
+        let x = Math.random() * (window.innerWidth - 60);
+        let y = Math.random() * (window.innerHeight - 200) + 100;
+        golden.style.left = x + "px";
+        golden.style.top = y + "px";
+
+        document.body.appendChild(golden);
+        goldenCookieActive = true;
+
+        golden.onclick = function() {
+            let bonus = Math.max(100, pointsPerClick * 5);
+            score += bonus;
+            createFloatingText("+" + bonus + " GOLD!", x+25, y);
+            golden.remove();
+            goldenCookieActive = false;
+            checkAchievements();
+        };
+
+        setTimeout(() => {
+            if(document.body.contains(golden)) {
+                golden.remove();
+                goldenCookieActive = false;
+            }
+        }, 5000);
+    }
+
+    function randomGoldenCookieSpawn() {
+        let time = Math.random() * 10000 + 10000;
+        setTimeout(() => {
+            spawnGoldenCookie();
+            randomGoldenCookieSpawn();
+        }, time);
+    }
+
+    // ---- Achievements ----
+    function checkAchievements() {
+        if(!achievements.firstClick && score >= 1) {
+            achievements.firstClick = true;
+            showAchievement("First Click!");
+        }
+        if(!achievements.hundredPoints && score >= 100) {
+            achievements.hundredPoints = true;
+            showAchievement("100 Points!");
+        }
+        if(!achievements.tenGrandmas && shopItems[1].amount >= 10) {
+            achievements.tenGrandmas = true;
+            showAchievement("Grandma's Favorite (10 Grandmas)!");
+        }
+        if(!achievements.firstFactory && shopItems[3].amount >= 1) {
+            achievements.firstFactory = true;
+            showAchievement("Factory Online!");
+        }
+        if(!achievements.oneMillion && score >= 1000000) {
+            achievements.oneMillion = true;
+            showAchievement("One in a Million!");
+        }
+    }
+
+    function showAchievement(text) {
+        const ach = document.createElement("div");
+        ach.className = "achievement";
+        ach.innerText = "🏆 Achievement: " + text;
+        document.body.appendChild(ach);
+
+        setTimeout(() => ach.remove(), 4500);
+    }
+
+    // Intervals
+    setInterval(autoClick, 1000);
+    randomGoldenCookieSpawn();
+
+    // Init
     buildShop();
     updateDisplay();
 </script>
