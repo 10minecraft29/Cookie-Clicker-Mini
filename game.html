@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -42,4 +42,146 @@
         background-color: white;
         padding: 15px;
         border-radius: 8px;
-        box-sha
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        width: 180px;
+        text-align: center;
+    }
+    .shop-item button {
+        margin-top: 10px;
+        width: 100%;
+    }
+    /* Floating +1 effect */
+    .float-text {
+        position: absolute;
+        font-size: 20px;
+        color: #ff4500;
+        font-weight: bold;
+        animation: floatUp 1s ease-out forwards;
+        pointer-events: none;
+    }
+    @keyframes floatUp {
+        0% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-50px); }
+    }
+</style>
+</head>
+<body>
+
+<h1>Cookie Clicker Mini Expanded</h1>
+<div id="score">Score: 0</div>
+
+<button class="button" onclick="clickButton(event)">Click Me!</button>
+<p id="info">Points per click: 1 | Points per second: 0</p>
+
+<div class="shop" id="shop"></div>
+
+<script>
+    let score = 0;
+    let pointsPerClick = 1;
+
+    // Dynamic shop array
+    let shopItems = [
+        { name: "Cursor", baseCost: 15, cost: 15, amount: 0, cps: 0.1 },
+        { name: "Grandma", baseCost: 100, cost: 100, amount: 0, cps: 1 },
+        { name: "Farm", baseCost: 500, cost: 500, amount: 0, cps: 5 },
+        { name: "Factory", baseCost: 2000, cost: 2000, amount: 0, cps: 20 },
+        { name: "Bank", baseCost: 10000, cost: 10000, amount: 0, cps: 100 },
+        { name: "Mine", baseCost: 50000, cost: 50000, amount: 0, cps: 500 }
+    ];
+
+    // Load save
+    if(localStorage.getItem("clickerSaveExpanded")) {
+        let save = JSON.parse(localStorage.getItem("clickerSaveExpanded"));
+        score = save.score;
+        pointsPerClick = save.pointsPerClick;
+        shopItems = save.shopItems;
+    }
+
+    // Build shop UI
+    function buildShop() {
+        const shopDiv = document.getElementById("shop");
+        shopDiv.innerHTML = "";
+        shopItems.forEach((item, index) => {
+            let div = document.createElement("div");
+            div.className = "shop-item";
+            div.innerHTML = `
+                <h3>${item.name}</h3>
+                <p>+${item.cps} per sec</p>
+                <p id="item${index}Info">Owned: ${item.amount} | Cost: ${item.cost}</p>
+                <button class="button" onclick="buyItem(${index})">Buy</button>
+            `;
+            shopDiv.appendChild(div);
+        });
+    }
+
+    function clickButton(event) {
+        score += pointsPerClick;
+        createFloatingText("+" + pointsPerClick, event.clientX, event.clientY);
+        updateDisplay();
+    }
+
+    function buyItem(index) {
+        let item = shopItems[index];
+        if(score >= item.cost) {
+            score -= item.cost;
+            item.amount++;
+            item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+            updateDisplay();
+        }
+    }
+
+    function autoClick() {
+        let autoPoints = 0;
+        shopItems.forEach(item => autoPoints += item.amount * item.cps);
+        score += autoPoints;
+        if(autoPoints > 0) {
+            createFloatingText("+" + autoPoints.toFixed(1), window.innerWidth/2, 100);
+        }
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        document.getElementById("score").innerText = "Score: " + Math.floor(score);
+        let pps = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0);
+        document.getElementById("info").innerText = 
+            "Points per click: " + pointsPerClick + " | Points per second: " + pps.toFixed(1);
+
+        shopItems.forEach((item, index) => {
+            document.getElementById("item"+index+"Info").innerText = 
+                `Owned: ${item.amount} | Cost: ${item.cost}`;
+        });
+
+        saveGame();
+    }
+
+    function saveGame() {
+        let save = {
+            score: score,
+            pointsPerClick: pointsPerClick,
+            shopItems: shopItems
+        };
+        localStorage.setItem("clickerSaveExpanded", JSON.stringify(save));
+    }
+
+    function createFloatingText(text, x, y) {
+        const floatText = document.createElement("div");
+        floatText.className = "float-text";
+        floatText.innerText = text;
+        document.body.appendChild(floatText);
+
+        floatText.style.left = x + "px";
+        floatText.style.top = y + "px";
+
+        setTimeout(() => floatText.remove(), 1000);
+    }
+
+    // Auto click every second
+    setInterval(autoClick, 1000);
+
+    // Initialize
+    buildShop();
+    updateDisplay();
+</script>
+
+</body>
+</html>
