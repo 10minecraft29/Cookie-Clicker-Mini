@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cookie Clicker Mini</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ultimate Clicker Deluxe</title>
 <style>
   body { font-family: 'Segoe UI', sans-serif; margin: 0; background: linear-gradient(to bottom, #6dd5ed, #2193b0); color: #fff; }
   header { position: sticky; top: 0; background: rgba(0,0,0,0.4); padding: 15px; font-size: 24px; text-align: center; font-weight: bold; }
@@ -16,8 +16,6 @@
   #prestigeBtn { display: none; background-color: #d2691e; margin-top: 10px; border: none; padding: 8px 20px; border-radius: 8px; color: white; cursor: pointer; }
   #gameButtons { margin-top: 15px; }
   #gameButtons button { margin: 5px; border-radius: 8px; border: none; padding: 8px 20px; cursor: pointer; }
-  #watchAdBtn { background: #00bcd4; color: white; }
-  #watchAdBtn:hover { background: #26c6da; }
   #shop { flex: 1; min-width: 300px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
   .shop-item { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; text-align: center; transition: background 0.2s; }
   .shop-item.affordable { background: rgba(0,255,0,0.15); }
@@ -30,9 +28,6 @@
   .golden-cookie { position: absolute; width: 50px; height: 50px; background: gold; border-radius: 50%; border: 3px solid #daa520; cursor: pointer; animation: popIn 0.3s ease-out; box-shadow: 0 0 15px rgba(255,215,0,0.7); }
   .mega-cookie { width: 80px !important; height: 80px !important; background: orange !important; box-shadow: 0 0 25px rgba(255,140,0,0.9) !important; border-color: #ff8c00 !important; }
   @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-
-  #adModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); color: white; font-size: 28px; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10000; user-select: none; overflow: hidden; }
-  #adModal button { margin-top: 20px; font-size: 18px; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; background: #d2691e; color: white; }
 
   #adminBtn { position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; z-index: 20000; }
   #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); padding: 20px; border-radius: 12px; z-index: 20001; color: white; text-align: center; width: 300px; }
@@ -52,15 +47,9 @@
     <div id="prestigeInfo">Prestige Points: 0 | Multiplier: 1.00x</div>
     <div id="gameButtons">
       <button id="prestigeBtn" onclick="prestige()">Prestige Reset</button>
-      <button id="watchAdBtn" onclick="startAd()">Watch Ad for Bonus</button>
     </div>
   </div>
   <div id="shop"></div>
-</div>
-
-<div id="adModal">
-  <div>Ad playing... Please wait <span id="adCountdown">10</span> seconds</div>
-  <button onclick="cancelAd()">Cancel</button>
 </div>
 
 <div id="adminBtn" onclick="adminLogin()">Admin</div>
@@ -71,7 +60,6 @@
   <button onclick="unlockAll()">Unlock All Items</button>
   <button onclick="spawnGoldenCookie(false)">Spawn Golden Cookie</button>
   <button onclick="spawnGoldenCookie(true)">Spawn Mega Golden Cookie</button>
-  <button onclick="toggleAds()">Toggle Ads</button>
   <button id="wipeBtn" onclick="wipeSave()">Wipe Save / Reset Game</button>
   <button onclick="closeAdmin()">Close</button>
 </div>
@@ -83,8 +71,6 @@ let pointsPerClick = 1;
 let prestigePoints = 0;
 let prestigeMultiplier = 1;
 let prestigeThreshold = 1000000;
-let adsEnabled = true;
-let adTimeout;
 
 let shopItems = [
   { name: "Cursor", baseCost: 15, cost: 15, amount: 0, cps: 0.1 },
@@ -100,43 +86,157 @@ let shopItems = [
   { name: "Antimatter Condenser", baseCost: 250000000, cost: 250000000, amount: 0, cps: 2500000 }
 ];
 
-function saveGame(){ localStorage.setItem("clickerSave", JSON.stringify({score,basePointsPerClick,pointsPerClick,prestigePoints,prestigeMultiplier,shopItems})); }
-function loadGame(){ const d=JSON.parse(localStorage.getItem("clickerSave")); if(d){score=d.score;basePointsPerClick=d.basePointsPerClick;pointsPerClick=d.pointsPerClick;prestigePoints=d.prestigePoints;prestigeMultiplier=d.prestigeMultiplier;shopItems=d.shopItems;} }
+function saveGame() {
+  localStorage.setItem("clickerSave", JSON.stringify({score, basePointsPerClick, pointsPerClick, prestigePoints, prestigeMultiplier, shopItems}));
+}
+function loadGame() {
+  const data = JSON.parse(localStorage.getItem("clickerSave"));
+  if(data){
+    score = data.score;
+    basePointsPerClick = data.basePointsPerClick;
+    pointsPerClick = data.pointsPerClick;
+    prestigePoints = data.prestigePoints;
+    prestigeMultiplier = data.prestigeMultiplier;
+    shopItems = data.shopItems;
+  }
+}
 
-function updateDisplay(){
-  const cps=shopItems.reduce((s,i)=>s+i.cps*i.amount,0);
-  document.getElementById("score").innerText=`Score: ${Math.floor(score)}`;
-  document.getElementById("info").innerText=`Points per click: ${pointsPerClick} | Points per second: ${cps.toFixed(1)}`;
-  document.getElementById("prestigeInfo").innerText=`Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
-  document.getElementById("prestigeBtn").style.display=score>=prestigeThreshold?"inline-block":"none";
+function updateDisplay() {
+  const cps = shopItems.reduce((sum, i) => sum + i.cps * i.amount, 0);
+  document.getElementById("score").innerText = `Score: ${Math.floor(score)}`;
+  document.getElementById("info").innerText = `Points per click: ${pointsPerClick} | Points per second: ${cps.toFixed(1)}`;
+  document.getElementById("prestigeInfo").innerText = `Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
+  document.getElementById("prestigeBtn").style.display = score >= prestigeThreshold ? "inline-block" : "none";
   renderShop();
 }
-function clickButton(e){ score+=pointsPerClick; createFloatingText(`+${pointsPerClick}`,e.clientX,e.clientY); updateDisplay(); }
-function createFloatingText(t,x,y){ const el=document.createElement("div"); el.innerText=t; el.className="float-text"; el.style.left=x+"px"; el.style.top=y+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(),1000); }
-function renderShop(){ const shopDiv=document.getElementById("shop"); shopDiv.innerHTML=""; shopItems.forEach((item,i)=>{const div=document.createElement("div"); div.className="shop-item"; if(score>=item.cost) div.classList.add("affordable"); div.innerHTML=`<h3>${item.name}</h3><p>Owned: ${item.amount}</p><p>Cost: ${Math.floor(item.cost)}</p><p>CPS: ${item.cps}</p><button onclick="buyItem(${i})">Buy</button>`; shopDiv.appendChild(div); }); }
-function buyItem(i){ let item=shopItems[i]; if(score>=item.cost){ score-=item.cost; item.amount++; item.cost=Math.floor(item.baseCost*Math.pow(1.15,item.amount)); pointsPerClick=Math.floor(basePointsPerClick*prestigeMultiplier); updateDisplay(); } }
-function prestige(){ if(score>=prestigeThreshold){ prestigePoints+=Math.floor(score/prestigeThreshold); prestigeMultiplier=1+prestigePoints*0.1; score=0; basePointsPerClick=1; pointsPerClick=1; shopItems.forEach(i=>{i.amount=0;i.cost=i.baseCost;}); updateDisplay(); } }
 
-function startAd(){ if(!adsEnabled)return; document.getElementById("adModal").style.display="flex"; let c=10; document.getElementById("adCountdown").innerText=c; adTimeout=setInterval(()=>{c--;document.getElementById("adCountdown").innerText=c;if(c<=0){clearInterval(adTimeout);finishAd();}},1000); }
-function finishAd(){ score+=100; document.getElementById("adModal").style.display="none"; updateDisplay(); }
-function cancelAd(){ document.getElementById("adModal").style.display="none"; clearInterval(adTimeout); }
+function clickButton(e) {
+  score += pointsPerClick;
+  createFloatingText(`+${pointsPerClick}`, e.clientX, e.clientY);
+  updateDisplay();
+}
 
-function adminLogin(){ const pass=prompt("Enter admin password:"); if(pass==="80231021") document.getElementById("adminPanel").style.display="block"; else alert("Wrong password"); }
-function closeAdmin(){ document.getElementById("adminPanel").style.display="none"; }
-function addScore(a){ score+=a; updateDisplay(); }
-function addPrestige(a){ prestigePoints+=a; updateDisplay(); }
-function unlockAll(){ shopItems.forEach(i=>i.amount=10); updateDisplay(); }
-function toggleAds(){ adsEnabled=!adsEnabled; alert("Ads "+(adsEnabled?"On":"Off")); }
-function wipeSave(){ if(confirm("Wipe all progress?")){ localStorage.removeItem("clickerSave"); location.reload(); } }
+function createFloatingText(text, x, y) {
+  const el = document.createElement("div");
+  el.innerText = text;
+  el.className = "float-text";
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
 
-function spawnGoldenCookie(mega=false){ const gc=document.createElement("div"); gc.className="golden-cookie"; if(mega)gc.classList.add("mega-cookie"); let x=Math.random()*(window.innerWidth-100),y=Math.random()*(window.innerHeight-200)+100; gc.style.left=x+"px";gc.style.top=y+"px"; document.body.appendChild(gc); gc.onclick=()=>{let bonus=Math.max(100,pointsPerClick*5);if(mega)bonus*=10;score+=bonus;createFloatingText("+"+bonus+(mega?" MEGA!":""),x+25,y);gc.remove();updateDisplay();}; setTimeout(()=>gc.remove(),5000); }
+function renderShop() {
+  const shopDiv = document.getElementById("shop");
+  shopDiv.innerHTML = "";
+  shopItems.forEach((item, idx) => {
+    const div = document.createElement("div");
+    div.className = "shop-item";
+    if(score >= item.cost) div.classList.add("affordable");
+    div.innerHTML = `
+      <h3>${item.name}</h3>
+      <p>Owned: ${item.amount}</p>
+      <p>Cost: ${Math.floor(item.cost)}</p>
+      <p>CPS: ${item.cps}</p>
+      <button onclick="buyItem(${idx})">Buy</button>
+    `;
+    shopDiv.appendChild(div);
+  });
+}
 
-setInterval(()=>{ score+=shopItems.reduce((s,i)=>s+i.cps*i.amount,0)/10; updateDisplay(); },100);
-setInterval(()=>{saveGame()},5000);
-setInterval(()=>{if(Math.random()<0.1)spawnGoldenCookie(false)},10000);
+function buyItem(i) {
+  let item = shopItems[i];
+  if(score >= item.cost){
+    score -= item.cost;
+    item.amount++;
+    item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+    pointsPerClick = Math.floor(basePointsPerClick * prestigeMultiplier);
+    updateDisplay();
+  }
+}
 
-loadGame(); updateDisplay();
+function prestige() {
+  if(score >= prestigeThreshold) {
+    prestigePoints += Math.floor(score / prestigeThreshold);
+    prestigeMultiplier = 1 + prestigePoints * 0.1;
+    score = 0;
+    basePointsPerClick = 1;
+    pointsPerClick = 1;
+    shopItems.forEach(i => { i.amount = 0; i.cost = i.baseCost; });
+    updateDisplay();
+  }
+}
+
+function adminLogin() {
+  const pass = prompt("Enter admin password:");
+  if(pass === "80231021") {
+    document.getElementById("adminPanel").style.display = "block";
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function closeAdmin() {
+  document.getElementById("adminPanel").style.display = "none";
+}
+
+function addScore(a) {
+  score += a;
+  updateDisplay();
+}
+
+function addPrestige(a) {
+  prestigePoints += a;
+  updateDisplay();
+}
+
+function unlockAll() {
+  shopItems.forEach(i => i.amount = 10);
+  updateDisplay();
+}
+
+function wipeSave() {
+  if(confirm("Wipe all progress?")) {
+    localStorage.removeItem("clickerSave");
+    location.reload();
+  }
+}
+
+function spawnGoldenCookie(mega = false) {
+  const gc = document.createElement("div");
+  gc.className = "golden-cookie";
+  if(mega) gc.classList.add("mega-cookie");
+  let x = Math.random() * (window.innerWidth - 100);
+  let y = Math.random() * (window.innerHeight - 200) + 100;
+  gc.style.left = x + "px";
+  gc.style.top = y + "px";
+  document.body.appendChild(gc);
+  gc.onclick = () => {
+    let bonus = Math.max(100, pointsPerClick * 5);
+    if(mega) bonus *= 10;
+    score += bonus;
+    createFloatingText("+" + bonus + (mega ? " MEGA!" : ""), x + 25, y);
+    gc.remove();
+    updateDisplay();
+  };
+  setTimeout(() => gc.remove(), 5000);
+}
+
+setInterval(() => {
+  score += shopItems.reduce((sum, i) => sum + i.cps * i.amount, 0) / 10;
+  updateDisplay();
+}, 100);
+
+setInterval(() => {
+  saveGame();
+}, 5000);
+
+setInterval(() => {
+  if(Math.random() < 0.1) spawnGoldenCookie(false);
+}, 10000);
+
+loadGame();
+updateDisplay();
 </script>
 </body>
 </html>
-
