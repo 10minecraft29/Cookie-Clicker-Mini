@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ultimate Clicker Deluxe</title>
+<title>Cookie Clicker Mini</title>
 <style>
   body { font-family: 'Segoe UI', sans-serif; margin: 0; background: linear-gradient(to bottom, #6dd5ed, #2193b0); color: #fff; }
   header { position: sticky; top: 0; background: rgba(0,0,0,0.4); padding: 15px; font-size: 24px; text-align: center; font-weight: bold; }
@@ -27,20 +27,13 @@
   .float-text { position: absolute; font-size: 20px; color: yellow; font-weight: bold; animation: floatUp 1s ease-out forwards; pointer-events: none; }
   @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-50px); } }
 
-  /* Golden Cookies */
   .golden-cookie { position: absolute; width: 50px; height: 50px; background: gold; border-radius: 50%; border: 3px solid #daa520; cursor: pointer; animation: popIn 0.3s ease-out; box-shadow: 0 0 15px rgba(255,215,0,0.7); }
   .mega-cookie { width: 80px !important; height: 80px !important; background: orange !important; box-shadow: 0 0 25px rgba(255,140,0,0.9) !important; border-color: #ff8c00 !important; }
   @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
 
-  /* Fake Ad Modal */
   #adModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); color: white; font-size: 28px; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10000; user-select: none; overflow: hidden; }
   #adModal button { margin-top: 20px; font-size: 18px; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; background: #d2691e; color: white; }
 
-  /* BonziBuddy Popup */
-  #bonziPopup { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(240, 230, 140, 0.95); font-family: 'Comic Sans MS', cursive, sans-serif; color: #4b3621; font-weight: bold; font-size: 32px; z-index: 11000; display: flex; flex-direction: column; justify-content: center; align-items: center; user-select: none; }
-  #bonziPopup button { margin-top: 30px; padding: 12px 30px; border: none; background: #daa520; color: white; border-radius: 8px; cursor: pointer; font-size: 24px; font-weight: bold; }
-
-  /* Admin Panel */
   #adminBtn { position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; z-index: 20000; }
   #adminPanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); padding: 20px; border-radius: 12px; z-index: 20001; color: white; text-align: center; width: 300px; }
   #adminPanel button { display: block; width: 100%; margin: 8px 0; padding: 8px; border-radius: 6px; border: none; background: #00bcd4; color: white; cursor: pointer; }
@@ -65,19 +58,11 @@
   <div id="shop"></div>
 </div>
 
-<!-- Fake Ad Modal -->
 <div id="adModal">
   <div>Ad playing... Please wait <span id="adCountdown">10</span> seconds</div>
   <button onclick="cancelAd()">Cancel</button>
 </div>
 
-<!-- BonziBuddy Popup -->
-<div id="bonziPopup">
-  Download BonziBuddy Today!
-  <button onclick="closeBonzi()">Close</button>
-</div>
-
-<!-- Admin Panel -->
 <div id="adminBtn" onclick="adminLogin()">Admin</div>
 <div id="adminPanel">
   <h3>Admin Panel</h3>
@@ -87,7 +72,6 @@
   <button onclick="spawnGoldenCookie(false)">Spawn Golden Cookie</button>
   <button onclick="spawnGoldenCookie(true)">Spawn Mega Golden Cookie</button>
   <button onclick="toggleAds()">Toggle Ads</button>
-  <button onclick="toggleBonzi()">Toggle BonziBuddy</button>
   <button id="wipeBtn" onclick="wipeSave()">Wipe Save / Reset Game</button>
   <button onclick="closeAdmin()">Close</button>
 </div>
@@ -100,7 +84,6 @@ let prestigePoints = 0;
 let prestigeMultiplier = 1;
 let prestigeThreshold = 1000000;
 let adsEnabled = true;
-let bonziEnabled = true;
 let adTimeout;
 
 let shopItems = [
@@ -117,19 +100,42 @@ let shopItems = [
   { name: "Antimatter Condenser", baseCost: 250000000, cost: 250000000, amount: 0, cps: 2500000 }
 ];
 
-/* === SAVE & LOAD === */
-function saveGame() {
-  localStorage.setItem("clickerSave", JSON.stringify({score,basePointsPerClick,pointsPerClick,prestigePoints,prestigeMultiplier,shopItems}));
-}
-function loadGame() {
-  const data = JSON.parse(localStorage.getItem("clickerSave"));
-  if(data){ score=data.score; basePointsPerClick=data.basePointsPerClick; pointsPerClick=data.pointsPerClick; prestigePoints=data.prestigePoints; prestigeMultiplier=data.prestigeMultiplier; shopItems=data.shopItems; }
-}
+function saveGame(){ localStorage.setItem("clickerSave", JSON.stringify({score,basePointsPerClick,pointsPerClick,prestigePoints,prestigeMultiplier,shopItems})); }
+function loadGame(){ const d=JSON.parse(localStorage.getItem("clickerSave")); if(d){score=d.score;basePointsPerClick=d.basePointsPerClick;pointsPerClick=d.pointsPerClick;prestigePoints=d.prestigePoints;prestigeMultiplier=d.prestigeMultiplier;shopItems=d.shopItems;} }
 
-/* === MAIN GAME FUNCTIONS === */
-// (Clicking, shop, prestige, ads, bonzi, admin, wipe save, golden cookies)
-// -- identical logic to previous version --
+function updateDisplay(){
+  const cps=shopItems.reduce((s,i)=>s+i.cps*i.amount,0);
+  document.getElementById("score").innerText=`Score: ${Math.floor(score)}`;
+  document.getElementById("info").innerText=`Points per click: ${pointsPerClick} | Points per second: ${cps.toFixed(1)}`;
+  document.getElementById("prestigeInfo").innerText=`Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
+  document.getElementById("prestigeBtn").style.display=score>=prestigeThreshold?"inline-block":"none";
+  renderShop();
+}
+function clickButton(e){ score+=pointsPerClick; createFloatingText(`+${pointsPerClick}`,e.clientX,e.clientY); updateDisplay(); }
+function createFloatingText(t,x,y){ const el=document.createElement("div"); el.innerText=t; el.className="float-text"; el.style.left=x+"px"; el.style.top=y+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(),1000); }
+function renderShop(){ const shopDiv=document.getElementById("shop"); shopDiv.innerHTML=""; shopItems.forEach((item,i)=>{const div=document.createElement("div"); div.className="shop-item"; if(score>=item.cost) div.classList.add("affordable"); div.innerHTML=`<h3>${item.name}</h3><p>Owned: ${item.amount}</p><p>Cost: ${Math.floor(item.cost)}</p><p>CPS: ${item.cps}</p><button onclick="buyItem(${i})">Buy</button>`; shopDiv.appendChild(div); }); }
+function buyItem(i){ let item=shopItems[i]; if(score>=item.cost){ score-=item.cost; item.amount++; item.cost=Math.floor(item.baseCost*Math.pow(1.15,item.amount)); pointsPerClick=Math.floor(basePointsPerClick*prestigeMultiplier); updateDisplay(); } }
+function prestige(){ if(score>=prestigeThreshold){ prestigePoints+=Math.floor(score/prestigeThreshold); prestigeMultiplier=1+prestigePoints*0.1; score=0; basePointsPerClick=1; pointsPerClick=1; shopItems.forEach(i=>{i.amount=0;i.cost=i.baseCost;}); updateDisplay(); } }
 
+function startAd(){ if(!adsEnabled)return; document.getElementById("adModal").style.display="flex"; let c=10; document.getElementById("adCountdown").innerText=c; adTimeout=setInterval(()=>{c--;document.getElementById("adCountdown").innerText=c;if(c<=0){clearInterval(adTimeout);finishAd();}},1000); }
+function finishAd(){ score+=100; document.getElementById("adModal").style.display="none"; updateDisplay(); }
+function cancelAd(){ document.getElementById("adModal").style.display="none"; clearInterval(adTimeout); }
+
+function adminLogin(){ const pass=prompt("Enter admin password:"); if(pass==="80231021") document.getElementById("adminPanel").style.display="block"; else alert("Wrong password"); }
+function closeAdmin(){ document.getElementById("adminPanel").style.display="none"; }
+function addScore(a){ score+=a; updateDisplay(); }
+function addPrestige(a){ prestigePoints+=a; updateDisplay(); }
+function unlockAll(){ shopItems.forEach(i=>i.amount=10); updateDisplay(); }
+function toggleAds(){ adsEnabled=!adsEnabled; alert("Ads "+(adsEnabled?"On":"Off")); }
+function wipeSave(){ if(confirm("Wipe all progress?")){ localStorage.removeItem("clickerSave"); location.reload(); } }
+
+function spawnGoldenCookie(mega=false){ const gc=document.createElement("div"); gc.className="golden-cookie"; if(mega)gc.classList.add("mega-cookie"); let x=Math.random()*(window.innerWidth-100),y=Math.random()*(window.innerHeight-200)+100; gc.style.left=x+"px";gc.style.top=y+"px"; document.body.appendChild(gc); gc.onclick=()=>{let bonus=Math.max(100,pointsPerClick*5);if(mega)bonus*=10;score+=bonus;createFloatingText("+"+bonus+(mega?" MEGA!":""),x+25,y);gc.remove();updateDisplay();}; setTimeout(()=>gc.remove(),5000); }
+
+setInterval(()=>{ score+=shopItems.reduce((s,i)=>s+i.cps*i.amount,0)/10; updateDisplay(); },100);
+setInterval(()=>{saveGame()},5000);
+setInterval(()=>{if(Math.random()<0.1)spawnGoldenCookie(false)},10000);
+
+loadGame(); updateDisplay();
 </script>
 </body>
 </html>
