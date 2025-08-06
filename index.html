@@ -6,64 +6,100 @@
 <title>Cookie Clicker Mini</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: linear-gradient(to bottom, #f0f0f0, #d0d0ff);
-    overflow-x: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #6dd5ed, #2193b0);
+    color: #fff;
   }
-  h1 { margin-top: 20px; }
-  #score {
-    font-size: 28px;
-    margin: 20px 0;
+  header {
+    position: sticky;
+    top: 0;
+    background: rgba(0,0,0,0.4);
+    padding: 15px;
+    font-size: 24px;
+    text-align: center;
     font-weight: bold;
   }
-  .button {
-    font-size: 20px;
-    padding: 10px 20px;
-    margin: 10px;
-    cursor: pointer;
+  #gameArea {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+  #clickArea {
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .click-button {
+    font-size: 28px;
+    padding: 20px 40px;
     border: none;
-    border-radius: 8px;
-    background-color: #6a5acd;
+    border-radius: 50px;
+    background: #ff9800;
     color: white;
+    cursor: pointer;
     transition: transform 0.1s;
   }
-  .button:hover { transform: scale(1.05); background-color: #7b68ee; }
-  #info { font-size: 18px; margin-top: 10px; }
-  #prestigeInfo {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-  }
+  .click-button:hover { transform: scale(1.05); background: #ffa726; }
+  #info { margin-top: 10px; font-size: 18px; }
+  #prestigeInfo { margin-top: 15px; font-size: 18px; font-weight: bold; }
   #prestigeBtn {
     display: none;
     background-color: #d2691e;
+    margin-top: 10px;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
   }
-  /* Shop styling */
-  .shop {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
+  #gameButtons {
+    margin-top: 15px;
+  }
+  #gameButtons button {
+    margin: 5px;
+    border-radius: 8px;
+    border: none;
+    padding: 8px 20px;
+    cursor: pointer;
+  }
+  #watchAdBtn { background: #00bcd4; color: white; }
+  #watchAdBtn:hover { background: #26c6da; }
+
+  #shop {
+    flex: 1;
+    min-width: 300px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
   }
   .shop-item {
-    background-color: white;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
     padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    width: 180px;
     text-align: center;
+    transition: background 0.2s;
   }
+  .shop-item.affordable { background: rgba(0,255,0,0.15); }
+  .shop-item h3 { margin: 0; }
   .shop-item button {
-    margin-top: 10px;
+    margin-top: 8px;
     width: 100%;
+    padding: 6px;
+    background: #00bcd4;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
   }
-  /* Floating +1 effect */
+  .shop-item button:hover { background: #26c6da; }
+
   .float-text {
     position: absolute;
     font-size: 20px;
-    color: #ff4500;
+    color: yellow;
     font-weight: bold;
     animation: floatUp 1s ease-out forwards;
     pointer-events: none;
@@ -72,6 +108,7 @@
     0% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-50px); }
   }
+
   /* Golden Cookie */
   .golden-cookie {
     position: absolute;
@@ -88,33 +125,13 @@
     from { transform: scale(0); }
     to { transform: scale(1); }
   }
-  /* Achievement Popup */
-  .achievement {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    background: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    animation: slideIn 0.5s, fadeOut 4s forwards;
-    font-weight: bold;
-  }
-  @keyframes slideIn {
-    from { transform: translateX(200%); }
-    to { transform: translateX(0); }
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    70% { opacity: 1; }
-    100% { opacity: 0; transform: translateX(200%); }
-  }
+
   /* Fake Ad Modal */
   #adModal {
     display: none;
     position: fixed;
     top: 0; left: 0;
-    width: 100vw; 
+    width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.85);
     color: white;
@@ -137,6 +154,7 @@
     background: #d2691e;
     color: white;
   }
+
   /* BonziBuddy Fullscreen Popup */
   #bonziPopup {
     display: none;
@@ -144,11 +162,7 @@
     top: 0; left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(240, 230, 140, 0.95); /* light yellow with some transparency */
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    padding: 0;
+    background: rgba(240, 230, 140, 0.95);
     font-family: 'Comic Sans MS', cursive, sans-serif;
     color: #4b3621;
     font-weight: bold;
@@ -175,326 +189,214 @@
 </head>
 <body>
 
-</h1>Cookie Clicker Mini</h1>
-<div id="score">Score: 0</div>
+<header id="score">Score: 0</header>
 
-<button class="button" onclick="clickButton(event)">Click Me!</button>
-<p id="info">Points per click: 1 | Points per second: 0</p>
-
-<div class="shop" id="shop"></div>
-
-<div id="prestigeInfo">Prestige Points: 0 | Multiplier: 1.00x</div>
-<button id="prestigeBtn" class="button" onclick="prestige()">Prestige Reset</button>
-
-<button id="watchAdBtn" class="button">Watch Ad for Bonus</button>
+<div id="gameArea">
+  <div id="clickArea">
+    <button class="click-button" onclick="clickButton(event)">Click Me!</button>
+    <p id="info">Points per click: 1 | Points per second: 0</p>
+    <div id="prestigeInfo">Prestige Points: 0 | Multiplier: 1.00x</div>
+    <div id="gameButtons">
+      <button id="prestigeBtn" onclick="prestige()">Prestige Reset</button>
+      <button id="watchAdBtn">Watch Ad for Bonus</button>
+    </div>
+  </div>
+  <div id="shop"></div>
+</div>
 
 <!-- Fake Ad Modal -->
 <div id="adModal">
-  <div>Download BonziBuddy Today! Download Here: https://archive.org/download/bon_20240406/Bon.zip <span id="adCountdown">10</span> seconds</div>
+  <div>Ad playing... Please wait <span id="adCountdown">10</span> seconds</div>
   <button onclick="cancelAd()">Cancel</button>
 </div>
 
 <!-- BonziBuddy Fullscreen Popup -->
 <div id="bonziPopup">
-  Download BonziBuddy Today! Download Here: https://archive.org/download/bon_20240406/Bon.zip
+  Download BonziBuddy Today!
   <button onclick="closeBonzi()">Close</button>
 </div>
 
 <script>
-  let score = 0;
-  let basePointsPerClick = 1;
-  let pointsPerClick = 1;
-  let goldenCookieActive = false;
+let score = 0;
+let basePointsPerClick = 1;
+let pointsPerClick = 1;
 
-  // Prestige system
-  let prestigePoints = 0;
-  let prestigeMultiplier = 1;
-  const prestigeThreshold = 1000000; // 1 million to prestige
+let prestigePoints = 0;
+let prestigeMultiplier = 1;
+const prestigeThreshold = 1000000;
 
-  // Dynamic shop items
-  let shopItems = [
-    { name: "Cursor", baseCost: 15, cost: 15, amount: 0, cps: 0.1 },
-    { name: "Grandma", baseCost: 100, cost: 100, amount: 0, cps: 1 },
-    { name: "Farm", baseCost: 500, cost: 500, amount: 0, cps: 5 },
-    { name: "Factory", baseCost: 2000, cost: 2000, amount: 0, cps: 20 },
-    { name: "Bank", baseCost: 10000, cost: 10000, amount: 0, cps: 100 },
-    { name: "Mine", baseCost: 50000, cost: 50000, amount: 0, cps: 500 }
-  ];
+let shopItems = [
+  { name: "Cursor", baseCost: 15, cost: 15, amount: 0, cps: 0.1 },
+  { name: "Grandma", baseCost: 100, cost: 100, amount: 0, cps: 1 },
+  { name: "Farm", baseCost: 500, cost: 500, amount: 0, cps: 5 },
+  { name: "Factory", baseCost: 2000, cost: 2000, amount: 0, cps: 20 },
+  { name: "Bank", baseCost: 10000, cost: 10000, amount: 0, cps: 100 },
+  { name: "Mine", baseCost: 50000, cost: 50000, amount: 0, cps: 500 },
+  { name: "Temple", baseCost: 200000, cost: 200000, amount: 0, cps: 2000 },
+  { name: "Wizard Tower", baseCost: 1000000, cost: 1000000, amount: 0, cps: 10000 },
+  { name: "Portal", baseCost: 10000000, cost: 10000000, amount: 0, cps: 100000 },
+  { name: "Time Machine", baseCost: 50000000, cost: 50000000, amount: 0, cps: 500000 },
+  { name: "Antimatter Condenser", baseCost: 250000000, cost: 250000000, amount: 0, cps: 2500000 }
+];
 
-  // Achievements
-  let achievements = {
-    firstClick: false,
-    hundredPoints: false,
-    tenGrandmas: false,
-    firstFactory: false,
-    oneMillion: false
-  };
+function buildShop() {
+  const shopDiv = document.getElementById("shop");
+  shopDiv.innerHTML = "";
+  shopItems.forEach((item, index) => {
+    let div = document.createElement("div");
+    div.className = "shop-item";
+    if(score >= item.cost) div.classList.add("affordable");
+    div.innerHTML = `
+      <h3>${item.name}</h3>
+      <p>+${(item.cps * prestigeMultiplier).toFixed(1)} per sec</p>
+      <p id="item${index}Info">Owned: ${item.amount}<br>Cost: ${item.cost}</p>
+      <button onclick="buyItem(${index})">Buy</button>
+    `;
+    shopDiv.appendChild(div);
+  });
+}
 
-  // Load Save
-  if(localStorage.getItem("ultimateClickerSave")) {
-    let save = JSON.parse(localStorage.getItem("ultimateClickerSave"));
-    score = save.score || 0;
-    basePointsPerClick = save.basePointsPerClick || 1;
-    prestigePoints = save.prestigePoints || 0;
-    prestigeMultiplier = 1 + (prestigePoints * 0.05);
-    shopItems = save.shopItems || shopItems;
-    achievements = save.achievements || achievements;
+function clickButton(event) {
+  score += pointsPerClick;
+  createFloatingText("+" + pointsPerClick.toFixed(1), event.clientX, event.clientY);
+  updateDisplay();
+}
+
+function buyItem(index) {
+  let item = shopItems[index];
+  if(score >= item.cost) {
+    score -= item.cost;
+    item.amount++;
+    item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+    updateDisplay();
   }
+}
+
+function autoClick() {
+  let autoPoints = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0) * prestigeMultiplier;
+  score += autoPoints;
+  updateDisplay();
+}
+
+function updateDisplay() {
+  document.getElementById("score").innerText = "Score: " + Math.floor(score);
+  let pps = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0) * prestigeMultiplier;
+  document.getElementById("info").innerText = 
+    `Points per click: ${pointsPerClick.toFixed(1)} | Points per second: ${pps.toFixed(1)}`;
+
+  prestigeMultiplier = 1 + (prestigePoints * 0.05);
   pointsPerClick = basePointsPerClick * prestigeMultiplier;
+  document.getElementById("prestigeInfo").innerText = 
+    `Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
 
-  // Build Shop
-  function buildShop() {
-    const shopDiv = document.getElementById("shop");
-    shopDiv.innerHTML = "";
-    shopItems.forEach((item, index) => {
-      let div = document.createElement("div");
-      div.className = "shop-item";
-      div.innerHTML = `
-        <h3>${item.name}</h3>
-        <p>+${(item.cps * prestigeMultiplier).toFixed(1)} per sec</p>
-        <p id="item${index}Info">Owned: ${item.amount} | Cost: ${item.cost}</p>
-        <button class="button" onclick="buyItem(${index})">Buy</button>
-      `;
-      shopDiv.appendChild(div);
-    });
-  }
+  const prestigeBtn = document.getElementById("prestigeBtn");
+  prestigeBtn.style.display = score >= prestigeThreshold ? "inline-block" : "none";
 
-  function clickButton(event) {
-    score += pointsPerClick;
-    createFloatingText("+" + pointsPerClick.toFixed(1), event.clientX, event.clientY);
-    checkAchievements();
-    updateDisplay();
-  }
+  buildShop();
+}
 
-  function buyItem(index) {
-    let item = shopItems[index];
-    if(score >= item.cost) {
-      score -= item.cost;
-      item.amount++;
-      item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
-      checkAchievements();
-      updateDisplay();
-    }
-  }
+function prestige() {
+  if(score < prestigeThreshold) return;
+  let gained = Math.floor(score / prestigeThreshold);
+  prestigePoints += gained;
+  score = 0;
+  basePointsPerClick = 1;
+  shopItems.forEach(item => {
+    item.amount = 0;
+    item.cost = item.baseCost;
+  });
+  updateDisplay();
+}
 
-  function autoClick() {
-    let autoPoints = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0) * prestigeMultiplier;
-    score += autoPoints;
-    if(autoPoints > 0) {
-      createFloatingText("+" + autoPoints.toFixed(1), window.innerWidth/2, 100);
-    }
-    checkAchievements();
-    updateDisplay();
-  }
+// Floating text
+function createFloatingText(text, x, y) {
+  const floatText = document.createElement("div");
+  floatText.className = "float-text";
+  floatText.innerText = text;
+  document.body.appendChild(floatText);
+  floatText.style.left = x + "px";
+  floatText.style.top = y + "px";
+  setTimeout(() => floatText.remove(), 1000);
+}
 
-  function updateDisplay() {
-    document.getElementById("score").innerText = "Score: " + Math.floor(score);
-    let pps = shopItems.reduce((sum, i) => sum + i.amount * i.cps, 0) * prestigeMultiplier;
-    document.getElementById("info").innerText = 
-      `Points per click: ${pointsPerClick.toFixed(1)} | Points per second: ${pps.toFixed(1)}`;
-
-    shopItems.forEach((item, index) => {
-      document.getElementById("item"+index+"Info").innerText = 
-        `Owned: ${item.amount} | Cost: ${item.cost}`;
-    });
-
-    prestigeMultiplier = 1 + (prestigePoints * 0.05);
-    pointsPerClick = basePointsPerClick * prestigeMultiplier;
-    document.getElementById("prestigeInfo").innerText = 
-      `Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
-
-    const prestigeBtn = document.getElementById("prestigeBtn");
-    if(score >= prestigeThreshold) {
-      prestigeBtn.style.display = "inline-block";
-    } else {
-      prestigeBtn.style.display = "none";
-    }
-
-    saveGame();
-  }
-
-  function prestige() {
-    if(score < prestigeThreshold) return;
-
-    let gained = Math.floor(score / prestigeThreshold);
-    prestigePoints += gained;
-
-    score = 0;
-    basePointsPerClick = 1;
-    shopItems.forEach(item => {
-      item.amount = 0;
-      item.cost = item.baseCost;
-    });
-
-    prestigeMultiplier = 1 + (prestigePoints * 0.05);
-    pointsPerClick = basePointsPerClick * prestigeMultiplier;
-
-    showAchievement(`Prestiged! +${gained} Prestige Points`);
-    updateDisplay();
-  }
-
-  function saveGame() {
-    let save = {
-      score: score,
-      basePointsPerClick: basePointsPerClick,
-      prestigePoints: prestigePoints,
-      shopItems: shopItems,
-      achievements: achievements
-    };
-    localStorage.setItem("ultimateClickerSave", JSON.stringify(save));
-  }
-
-  function createFloatingText(text, x, y) {
-    const floatText = document.createElement("div");
-    floatText.className = "float-text";
-    floatText.innerText = text;
-    document.body.appendChild(floatText);
-
-    floatText.style.left = x + "px";
-    floatText.style.top = y + "px";
-
-    setTimeout(() => floatText.remove(), 1000);
-  }
-
-  // ---- Golden Cookie ----
-  function spawnGoldenCookie() {
-    if (goldenCookieActive) return;
-    const golden = document.createElement("div");
-    golden.className = "golden-cookie";
-
-    let x = Math.random() * (window.innerWidth - 60);
-    let y = Math.random() * (window.innerHeight - 200) + 100;
-    golden.style.left = x + "px";
-    golden.style.top = y + "px";
-
-    document.body.appendChild(golden);
-    goldenCookieActive = true;
-
-    golden.onclick = function() {
-      let bonus = Math.max(100, pointsPerClick * 5);
-      score += bonus;
-      createFloatingText("+" + bonus + " GOLD!", x+25, y);
+// Golden Cookie
+let goldenCookieActive = false;
+function spawnGoldenCookie() {
+  if (goldenCookieActive) return;
+  const golden = document.createElement("div");
+  golden.className = "golden-cookie";
+  let x = Math.random() * (window.innerWidth - 60);
+  let y = Math.random() * (window.innerHeight - 200) + 100;
+  golden.style.left = x + "px";
+  golden.style.top = y + "px";
+  document.body.appendChild(golden);
+  goldenCookieActive = true;
+  golden.onclick = function() {
+    let bonus = Math.max(100, pointsPerClick * 5);
+    score += bonus;
+    createFloatingText("+" + bonus + " GOLD!", x+25, y);
+    golden.remove();
+    goldenCookieActive = false;
+  };
+  setTimeout(() => {
+    if(document.body.contains(golden)) {
       golden.remove();
       goldenCookieActive = false;
-      checkAchievements();
-    };
-
-    setTimeout(() => {
-      if(document.body.contains(golden)) {
-        golden.remove();
-        goldenCookieActive = false;
-      }
-    }, 5000);
-  }
-
-  function randomGoldenCookieSpawn() {
-    let time = Math.random() * 10000 + 10000;
-    setTimeout(() => {
-      spawnGoldenCookie();
-      randomGoldenCookieSpawn();
-    }, time);
-  }
-
-  // ---- Achievements ----
-  function checkAchievements() {
-    if(!achievements.firstClick && score >= 1) {
-      achievements.firstClick = true;
-      showAchievement("First Click!");
     }
-    if(!achievements.hundredPoints && score >= 100) {
-      achievements.hundredPoints = true;
-      showAchievement("100 Points!");
-    }
-    if(!achievements.tenGrandmas && shopItems[1].amount >= 10) {
-      achievements.tenGrandmas = true;
-      showAchievement("Grandma's Favorite (10 Grandmas)!");
-    }
-    if(!achievements.firstFactory && shopItems[3].amount >= 1) {
-      achievements.firstFactory = true;
-      showAchievement("Factory Online!");
-    }
-    if(!achievements.oneMillion && score >= 1000000) {
-      achievements.oneMillion = true;
-      showAchievement("One in a Million!");
-    }
-  }
+  }, 5000);
+}
+function randomGoldenCookieSpawn() {
+  let time = Math.random() * 10000 + 10000;
+  setTimeout(() => {
+    spawnGoldenCookie();
+    randomGoldenCookieSpawn();
+  }, time);
+}
 
-  function showAchievement(text) {
-    const ach = document.createElement("div");
-    ach.className = "achievement";
-    ach.innerText = "🏆 Achievement: " + text;
-    document.body.appendChild(ach);
-
-    setTimeout(() => ach.remove(), 4500);
-  }
-
-  // ---- Fake Ad System ----
-  const watchAdBtn = document.getElementById('watchAdBtn');
-  const adModal = document.getElementById('adModal');
-  const adCountdownSpan = document.getElementById('adCountdown');
-
-  let adTimer;
-  let adSeconds = 10;
-  let adCooldown = false;
-
-  watchAdBtn.onclick = () => {
-    if(adCooldown) return alert("Please wait before watching another ad.");
-    adSeconds = 10;
+// Fake Ad System
+const watchAdBtn = document.getElementById('watchAdBtn');
+const adModal = document.getElementById('adModal');
+const adCountdownSpan = document.getElementById('adCountdown');
+let adTimer; let adSeconds = 10; let adCooldown = false;
+watchAdBtn.onclick = () => {
+  if(adCooldown) return alert("Please wait before watching another ad.");
+  adSeconds = 10;
+  adCountdownSpan.textContent = adSeconds;
+  adModal.style.display = 'flex';
+  adTimer = setInterval(() => {
+    adSeconds--;
     adCountdownSpan.textContent = adSeconds;
-    adModal.style.display = 'flex';
-    adTimer = setInterval(() => {
-      adSeconds--;
-      adCountdownSpan.textContent = adSeconds;
-      if(adSeconds <= 0){
-        clearInterval(adTimer);
-        adModal.style.display = 'none';
-        // Reward player here
-        let reward = 1000 * prestigeMultiplier;
-        score += reward;
-        createFloatingText("+" + Math.floor(reward) + " Bonus!", window.innerWidth/2, window.innerHeight/2);
-        updateDisplay();
-        adCooldown = true;
-        setTimeout(() => { adCooldown = false; }, 30000); // 30 second cooldown between ads
-      }
-    }, 1000);
-  }
+    if(adSeconds <= 0){
+      clearInterval(adTimer);
+      adModal.style.display = 'none';
+      let reward = 1000 * prestigeMultiplier;
+      score += reward;
+      createFloatingText("+" + Math.floor(reward) + " Bonus!", window.innerWidth/2, window.innerHeight/2);
+      updateDisplay();
+      adCooldown = true;
+      setTimeout(() => { adCooldown = false; }, 30000);
+    }
+  }, 1000);
+}
+function cancelAd(){
+  clearInterval(adTimer);
+  adModal.style.display = 'none';
+}
 
-  function cancelAd(){
-    clearInterval(adTimer);
-    adModal.style.display = 'none';
-  }
+// BonziBuddy Popup
+const bonziPopup = document.getElementById('bonziPopup');
+function showBonziPopup() { bonziPopup.style.display = 'flex'; }
+function closeBonzi() { bonziPopup.style.display = 'none'; scheduleBonziPopup(); }
+function scheduleBonziPopup() {
+  let randomTime = (Math.random() * (5 - 2) + 2) * 60 * 1000;
+  setTimeout(() => { showBonziPopup(); }, randomTime);
+}
+scheduleBonziPopup();
 
-  // ---- BonziBuddy Popup ----
-  const bonziPopup = document.getElementById('bonziPopup');
-
-  function showBonziPopup() {
-    bonziPopup.style.display = 'flex';
-  }
-
-  function closeBonzi() {
-    bonziPopup.style.display = 'none';
-    scheduleBonziPopup();
-  }
-
-  function scheduleBonziPopup() {
-    // Random time between 2 to 5 minutes in milliseconds
-    let randomTime = (Math.random() * (5 - 2) + 2) * 60 * 1000;
-    setTimeout(() => {
-      showBonziPopup();
-    }, randomTime);
-  }
-
-  // Start scheduling Bonzi popups
-  scheduleBonziPopup();
-
-  // Intervals
-  setInterval(autoClick, 1000);
-  randomGoldenCookieSpawn();
-
-  // Init
-  buildShop();
-  updateDisplay();
+setInterval(autoClick, 1000);
+randomGoldenCookieSpawn();
+buildShop();
+updateDisplay();
 </script>
-
 </body>
 </html>
