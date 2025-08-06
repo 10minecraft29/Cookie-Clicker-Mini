@@ -167,9 +167,20 @@ function prestige() {
   }
 }
 
-function adminLogin() {
+
+// Precomputed SHA-256 hash of "80231021" (hex string)
+const ADMIN_HASH = "e2c7e1e2e7e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2";
+
+async function adminLogin() {
   const pass = prompt("Enter admin password:");
-  if(pass === "80231021") {
+  if (!pass) return;
+  // Hash the input
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pass);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  if (hashHex === ADMIN_HASH) {
     document.getElementById("adminPanel").style.display = "block";
   } else {
     alert("Wrong password");
