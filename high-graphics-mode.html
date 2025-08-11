@@ -5,45 +5,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Cookie Clicker Mini</title>
 <style>
-  /* Basic polished UI (same as before) */
-  body { font-family: 'Segoe UI', sans-serif; margin:0; background: linear-gradient(to bottom,#6dd5ed,#2193b0); color:#fff; overflow-x:hidden; }
-  header { position: sticky; top:0; background: rgba(0,0,0,0.4); padding:12px; font-size:22px; text-align:center; font-weight:700; z-index:10; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; margin:0; background: linear-gradient(to bottom,#6dd5ed,#2193b0); color:#fff; overflow-x:hidden; }
+  header { position: sticky; top:0; background: rgba(0,0,0,0.45); padding:12px; font-size:20px; text-align:center; font-weight:700; z-index:10; }
   #gameArea { display:flex; justify-content:space-around; flex-wrap:wrap; padding:18px; gap:18px; }
   #clickArea { flex:1; min-width:260px; text-align:center; }
-  .click-button { font-size:26px; padding:18px 36px; border:none; border-radius:48px; background:#ff9800; color:#fff; cursor:pointer; transition:transform .08s; }
+  .click-button { font-size:24px; padding:16px 32px; border:none; border-radius:40px; background:#ff9800; color:#fff; cursor:pointer; transition:transform .08s; }
   .click-button:active { transform:scale(.98); }
-  #info { margin-top:12px; font-size:16px; }
-  #prestigeInfo { margin-top:10px; font-size:16px; font-weight:600; }
-  #gameButtons { margin-top:14px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-  #gameButtons button { padding:8px 14px; border-radius:8px; border:none; cursor:pointer; }
-  #watchAdBtn, #prestigeBtn { background:#d2691e; color:#fff; }
-  #shop { flex:1; min-width:320px; display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
-  .shop-item { background:rgba(255,255,255,0.08); border-radius:12px; padding:12px; text-align:center; transition:background .15s; box-shadow:0 2px 8px rgba(0,0,0,.15); }
+  #info { margin-top:10px; font-size:15px; }
+  #prestigeInfo { margin-top:8px; font-size:15px; font-weight:600; }
+  #gameButtons { margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  #prestigeBtn { background:#d2691e; color:#fff; padding:8px 12px; border-radius:8px; border:none; }
+  #shop { flex:1; min-width:320px; display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+  .shop-item { background:rgba(255,255,255,0.08); border-radius:10px; padding:10px; text-align:center; transition:background .12s; box-shadow:0 2px 6px rgba(0,0,0,.15); }
   .shop-item.affordable { background: rgba(0,255,0,0.12); }
-  .shop-item h3 { margin:0 0 6px 0; font-size:16px; }
+  .shop-item h3 { margin:0 0 6px 0; font-size:15px; }
   .shop-item p { margin:6px 0; font-size:13px; color:#f0f0f0; }
   .shop-item button { margin-top:6px; width:100%; padding:6px; border-radius:8px; border:none; background:#00bcd4; color:white; cursor:pointer; }
-  .float-text { position:absolute; font-size:18px; color:yellow; font-weight:700; animation: floatUp 1s ease-out forwards; pointer-events:none; text-shadow:0 1px 2px rgba(0,0,0,.5); }
-  @keyframes floatUp { 0% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(-60px); } }
-
-  .golden-cookie { position:absolute; width:50px; height:50px; background:gold; border-radius:50%; border:3px solid #daa520; cursor:pointer; box-shadow:0 0 15px rgba(255,215,0,.8); display:flex; align-items:center; justify-content:center; font-weight:900; color:#5a3100; }
+  .float-text { position:absolute; font-size:16px; color:yellow; font-weight:700; animation: floatUp 1s ease-out forwards; pointer-events:none; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+  @keyframes floatUp { 0% { opacity:1; transform:translateY(0);} 100% { opacity:0; transform:translateY(-60px);} }
+  .golden-cookie { position:absolute; width:48px; height:48px; background:gold; border-radius:50%; border:3px solid #daa520; cursor:pointer; box-shadow:0 0 12px rgba(255,215,0,.85); display:flex; align-items:center; justify-content:center; font-weight:900; color:#5a3100; }
   .mega-cookie { width:84px !important; height:84px !important; font-size:20px; background:orange !important; box-shadow:0 0 30px rgba(255,140,0,.95) !important; }
-
-  /* Admin */
   #adminBtn { position:fixed; bottom:10px; right:10px; background:rgba(0,0,0,.55); color:#fff; padding:8px 10px; border-radius:8px; font-size:12px; cursor:pointer; z-index:9999; }
-  #adminPanel { display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.9); padding:16px; border-radius:12px; width:320px; z-index:10000; }
-  #adminPanel h3 { margin:0 0 8px 0; font-size:18px; text-align:center; }
+  #adminPanel { display:none; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.94); padding:14px; border-radius:12px; width:360px; z-index:10000; }
+  #adminPanel h3 { margin:0 0 10px 0; font-size:18px; text-align:center; }
   #adminPanel button { display:block; width:100%; margin:8px 0; padding:8px; border-radius:8px; border:none; background:#00bcd4; color:white; cursor:pointer; }
   #wipeBtn { background:red !important; animation:flash 1s infinite; }
   @keyframes flash { 0%,100% { background:red; } 50% { background:darkred; } }
-
-  /* small status area */
-  #statusBar { position:fixed; left:10px; bottom:10px; background:rgba(0,0,0,0.45); color:#fff; padding:8px 10px; border-radius:8px; font-size:13px; z-index:9999; }
+  #statusBar { position:fixed; left:10px; bottom:10px; background:rgba(0,0,0,0.45); color:#fff; padding:8px 10px; border-radius:8px; font-size:13px; z-index:9999; max-width:40vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
-
-<header id="score">Score: 0</header>
+<header id="score">Cookie Clicker Mini — Score: 0</header>
 
 <div id="gameArea">
   <div id="clickArea">
@@ -58,7 +50,6 @@
   <div id="shop"></div>
 </div>
 
-<!-- Admin -->
 <div id="adminBtn">Admin</div>
 <div id="adminPanel" aria-hidden="true">
   <h3>Admin Panel</h3>
@@ -67,17 +58,17 @@
   <button id="unlockAllBtn">Unlock All Items</button>
   <button id="spawnCookieBtn">Spawn Golden Cookie</button>
   <button id="spawnMegaCookieBtn">Spawn Mega Golden Cookie</button>
-  <button id="toggleLagBtn">Toggle Lag (OFF)</button>
+  <!-- lag is permanent; Toggle Lag removed -->
   <button id="wipeBtn">Wipe Save / Reset Game</button>
   <button id="closeAdminBtn">Close</button>
 </div>
 
-<div id="statusBar">Autosave: idle</div>
+<div id="statusBar">Autosave: idle — WARNING: PERMANENT HEAVY LAG ENABLED</div>
 
 <script>
-/* ===========================
-   Game variables & settings
-   =========================== */
+/* ======================
+   Core game state
+   ====================== */
 let score = 0;
 let basePointsPerClick = 1;
 let prestigePoints = 0;
@@ -85,10 +76,10 @@ let prestigeMultiplier = 1;
 let pointsPerClick = basePointsPerClick * prestigeMultiplier;
 const prestigeThreshold = 1000000;
 
-let lagEnabled = false; // admin-toggleable "moderate lag" mode
+/* purposely heavy/malicious-looking memory container */
+let massiveMemory = []; // will grow large on purpose
 
-// Expanded shop up to Antimatter Condenser
-let shopItems = [
+const shopItems = [
   { name:"Cursor", baseCost:15, cost:15, amount:0, cps:0.1 },
   { name:"Grandma", baseCost:100, cost:100, amount:0, cps:1 },
   { name:"Farm", baseCost:500, cost:500, amount:0, cps:5 },
@@ -102,15 +93,14 @@ let shopItems = [
   { name:"Antimatter Condenser", baseCost:250000000, cost:250000000, amount:0, cps:2500000 }
 ];
 
-/* ===========================
-   DOM references
-   =========================== */
-const scoreEl = document.getElementById('score');
+/* DOM refs */
+const scoreHeader = document.getElementById('score');
 const infoEl = document.getElementById('info');
 const prestigeEl = document.getElementById('prestigeInfo');
 const shopEl = document.getElementById('shop');
 const clickBtn = document.getElementById('clickBtn');
 const prestigeBtn = document.getElementById('prestigeBtn');
+const statusBar = document.getElementById('statusBar');
 
 const adminBtn = document.getElementById('adminBtn');
 const adminPanel = document.getElementById('adminPanel');
@@ -119,148 +109,151 @@ const addPrestigeBtn = document.getElementById('addPrestigeBtn');
 const unlockAllBtn = document.getElementById('unlockAllBtn');
 const spawnCookieBtn = document.getElementById('spawnCookieBtn');
 const spawnMegaCookieBtn = document.getElementById('spawnMegaCookieBtn');
-const toggleLagBtn = document.getElementById('toggleLagBtn');
 const wipeBtn = document.getElementById('wipeBtn');
 const closeAdminBtn = document.getElementById('closeAdminBtn');
 
-const statusBar = document.getElementById('statusBar');
-
-/* ===========================
+/* ======================
    Save / Load (autosave)
-   =========================== */
+   ====================== */
 function saveGame(){
   try {
-    localStorage.setItem('clickerSave_v2', JSON.stringify({
+    localStorage.setItem('ccm_perma_lag_save', JSON.stringify({
       score, basePointsPerClick, prestigePoints, shopItems
     }));
-    statusBar.innerText = 'Autosave: saved ' + new Date().toLocaleTimeString();
+    statusBar.innerText = 'Autosave: saved ' + new Date().toLocaleTimeString() + ' — PERMANENT LAG';
   } catch(e){
-    console.warn('Save failed', e);
     statusBar.innerText = 'Autosave: failed';
+    console.warn('Save failed', e);
   }
 }
 function loadGame(){
-  const data = JSON.parse(localStorage.getItem('clickerSave_v2') || 'null');
-  if(data){
-    score = data.score || 0;
-    basePointsPerClick = data.basePointsPerClick || 1;
-    prestigePoints = data.prestigePoints || 0;
-    shopItems = data.shopItems || shopItems;
+  try {
+    const d = JSON.parse(localStorage.getItem('ccm_perma_lag_save') || 'null');
+    if(d){
+      score = d.score || 0;
+      basePointsPerClick = d.basePointsPerClick || 1;
+      prestigePoints = d.prestigePoints || 0;
+      if(d.shopItems && Array.isArray(d.shopItems)){
+        for(let i=0;i<shopItems.length;i++){
+          if(d.shopItems[i]) {
+            shopItems[i].amount = d.shopItems[i].amount || 0;
+            shopItems[i].cost = d.shopItems[i].cost || shopItems[i].baseCost;
+          }
+        }
+      }
+    }
+  } catch(e){
+    console.warn('Load failed', e);
   }
   updateFromPrestige();
 }
 
-/* ===========================
-   Update & render
-   =========================== */
+/* ======================
+   UI rendering
+   ====================== */
 function updateFromPrestige(){
-  prestigeMultiplier = 1 + prestigePoints * 0.05;
+  prestigeMultiplier = 1 + (prestigePoints * 0.05);
   pointsPerClick = basePointsPerClick * prestigeMultiplier;
 }
 function updateDisplay(){
   const pps = shopItems.reduce((s,i)=> s + i.cps * i.amount, 0) * prestigeMultiplier;
-  scoreEl.innerText = 'Score: ' + Math.floor(score);
+  scoreHeader.innerText = `Cookie Clicker Mini — Score: ${Math.floor(score)}`;
   infoEl.innerText = `Points per click: ${pointsPerClick.toFixed(1)} | Points per second: ${pps.toFixed(1)}`;
   prestigeEl.innerText = `Prestige Points: ${prestigePoints} | Multiplier: ${prestigeMultiplier.toFixed(2)}x`;
   prestigeBtn.style.display = score >= prestigeThreshold ? 'inline-block' : 'none';
-  renderShop(); // intentionally called often (inefficiently when lag on)
+  renderShop(); // deliberately expensive
 }
 
-/* renderShop intentionally inefficient when lag on */
+/* naive shop rebuild every update */
 function renderShop(){
-  // Naive rebuild of full shop DOM each call
   shopEl.innerHTML = '';
   for(let i=0;i<shopItems.length;i++){
     const it = shopItems[i];
-    const container = document.createElement('div');
-    container.className = 'shop-item' + (score >= it.cost ? ' affordable' : '');
-    // force string concatenation and innerHTML
-    container.innerHTML = '<h3>' + it.name + '</h3>' +
-                          '<p>Owned: ' + it.amount + '</p>' +
-                          '<p>Cost: ' + Math.floor(it.cost) + '</p>' +
-                          '<p>CPS: ' + it.cps + '</p>' +
-                          '<button data-idx="' + i + '">Buy</button>';
-    shopEl.appendChild(container);
-    // attach click handler (inefficient per-button binding)
-    const btn = container.querySelector('button');
-    btn.addEventListener('click', function(){ buyItem(parseInt(this.dataset.idx)); });
+    const card = document.createElement('div');
+    card.className = 'shop-item' + (score >= it.cost ? ' affordable' : '');
+    card.innerHTML = '<h3>' + it.name + '</h3>' +
+                     '<p>Owned: ' + it.amount + '</p>' +
+                     '<p>Cost: ' + Math.floor(it.cost) + '</p>' +
+                     '<p>CPS: ' + it.cps + '</p>' +
+                     '<button data-idx="' + i + '">Buy</button>';
+    shopEl.appendChild(card);
+    card.querySelector('button').addEventListener('click', function(){ buyItem(parseInt(this.dataset.idx)); });
   }
 }
 
-/* ===========================
-   Core game actions
-   =========================== */
-function buyItem(index){
-  const item = shopItems[index];
-  if(score >= item.cost){
-    score -= item.cost;
-    item.amount++;
-    item.cost = Math.floor(item.baseCost * Math.pow(1.15, item.amount));
+/* ======================
+   Actions
+   ====================== */
+function buyItem(idx){
+  const it = shopItems[idx];
+  if(score >= it.cost){
+    score -= it.cost;
+    it.amount++;
+    it.cost = Math.floor(it.baseCost * Math.pow(1.15, it.amount));
     updateDisplay();
   } else {
-    // slight intentional delay when trying to buy without money
-    for(let k=0;k<10000;k++) { Math.sqrt(k); }
+    // small busy work
+    for(let i=0;i<20000;i++) Math.sqrt(i);
   }
 }
 
+/* click handling — includes heavy synchronous work to ensure permanent lag */
 clickBtn.addEventListener('click', function(e){
-  // normal reward
   score += pointsPerClick;
   createFloatingText('+' + pointsPerClick.toFixed(1), e.clientX, e.clientY);
 
-  // extra small inefficient loop to add lag when enabled
-  if(lagEnabled){
-    // do a short busy loop that's moderately heavy
-    let s = 0;
-    for(let i=0;i<12000;i++){ s += Math.sqrt(i) % 13; }
-    // create and immediately remove a dummy invisible element (DOM churn)
-    const temp = document.createElement('div');
-    temp.style.position = 'absolute';
-    temp.style.left = '-9999px';
-    temp.innerText = s;
-    document.body.appendChild(temp);
-    // force layout thrash
-    void temp.offsetHeight;
-    temp.remove();
+  // heavy synchronous CPU & DOM workload (per click)
+  // large math loop
+  let acc = 0;
+  for(let i=0;i<2000000;i++){ acc += Math.sin(i) * Math.log(i+1); }
+  // create many hidden nodes and thrash layout
+  for(let k=0;k<200;k++){
+    const tmp = document.createElement('div');
+    tmp.style.position='absolute'; tmp.style.left='-9999px'; tmp.textContent = acc.toFixed(2) + Math.random().toFixed(6);
+    document.body.appendChild(tmp);
+    void tmp.offsetHeight;
+    tmp.remove();
   }
+  // bloat memory massively (but keep bounded-ish to avoid immediate OOM)
+  for(let m=0;m<5000;m++){
+    massiveMemory.push(new Array(100).fill(Math.random()));
+  }
+  if(massiveMemory.length > 500000) massiveMemory.splice(0, massiveMemory.length - 300000);
 
   updateDisplay();
 });
 
+/* prestige */
 prestigeBtn.addEventListener('click', function(){
   if(score >= prestigeThreshold){
     const gained = Math.floor(score / prestigeThreshold);
     prestigePoints += gained;
     score = 0;
     basePointsPerClick = 1;
-    shopItems.forEach(it => { it.amount = 0; it.cost = it.baseCost; });
+    for(let it of shopItems){ it.amount = 0; it.cost = it.baseCost; }
     updateFromPrestige();
     updateDisplay();
   }
 });
 
-/* ===========================
-   Floating text utility
-   =========================== */
-function createFloatingText(text, x, y){
+/* floating text */
+function createFloatingText(text,x,y){
   const el = document.createElement('div');
   el.className = 'float-text';
   el.style.left = (x - 20) + 'px';
   el.style.top = (y - 20) + 'px';
-  el.innerText = text;
+  el.textContent = text;
   document.body.appendChild(el);
   setTimeout(()=> el.remove(), 900);
 }
 
-/* ===========================
-   Golden cookie logic
-   =========================== */
+/* spawn golden cookie */
 function spawnGoldenCookie(mega=false){
   const gc = document.createElement('div');
   gc.className = 'golden-cookie' + (mega ? ' mega-cookie' : '');
-  gc.innerText = '★';
-  let x = Math.random() * (window.innerWidth - 120) + 20;
-  let y = Math.random() * (window.innerHeight - 240) + 80;
+  gc.textContent = '★';
+  const x = Math.random() * (window.innerWidth - 160) + 20;
+  const y = Math.random() * (window.innerHeight - 280) + 80;
   gc.style.left = x + 'px';
   gc.style.top = y + 'px';
   document.body.appendChild(gc);
@@ -274,151 +267,115 @@ function spawnGoldenCookie(mega=false){
     updateDisplay();
   });
 
-  // remove after 5s
   setTimeout(()=> { if(document.body.contains(gc)) gc.remove(); }, 5000);
 }
 
-/* ===========================
-   Admin panel & controls
-   =========================== */
+/* ======================
+   Admin Panel wiring
+   ====================== */
 adminBtn.addEventListener('click', adminLogin);
 function adminLogin(){
   const pass = prompt('Enter admin password:');
   if(pass === '80231021'){
     adminPanel.style.display = 'block';
-    adminPanel.setAttribute('aria-hidden', 'false');
+    adminPanel.setAttribute('aria-hidden','false');
   } else {
     alert('Incorrect password.');
   }
 }
 closeAdminBtn.addEventListener('click', function(){
   adminPanel.style.display = 'none';
-  adminPanel.setAttribute('aria-hidden', 'true');
+  adminPanel.setAttribute('aria-hidden','true');
 });
 
 addScoreBtn.addEventListener('click', function(){ score += 10000; updateDisplay(); });
 addPrestigeBtn.addEventListener('click', function(){ prestigePoints += 10; updateFromPrestige(); updateDisplay(); });
-unlockAllBtn.addEventListener('click', function(){ shopItems.forEach(it => it.amount = 10); updateDisplay(); });
+unlockAllBtn.addEventListener('click', function(){ for(let it of shopItems) it.amount = 10; updateDisplay(); });
 spawnCookieBtn.addEventListener('click', function(){ spawnGoldenCookie(false); });
 spawnMegaCookieBtn.addEventListener('click', function(){ spawnGoldenCookie(true); });
+wipeBtn.addEventListener('click', function(){ if(confirm('Wipe all progress?')){ localStorage.removeItem('ccm_perma_lag_save'); location.reload(); } });
 
-toggleLagBtn.addEventListener('click', function(){
-  lagEnabled = !lagEnabled;
-  toggleLagBtn.innerText = 'Toggle Lag (' + (lagEnabled ? 'ON' : 'OFF') + ')';
-  // when turning on, kick off the lag routines
-  if(lagEnabled){
-    startLagRoutines();
-  } else {
-    stopLagRoutines();
+/* ======================
+   Permanent heavy lag routines (start immediately)
+   ====================== */
+
+/* 1) Extremely heavy periodic CPU loop (runs often) */
+setInterval(function heavyCpuTick(){
+  // enormous CPU loop to throttle frame rate; intensity tuned for 5-10 FPS on many machines
+  let s = 0;
+  for(let i=0;i<4_000_000;i++){
+    // cheap-ish math but many iterations
+    s += Math.sqrt(i) % 7;
+    if(i % 1000000 === 0) { /* micro-yield point */ }
   }
-});
+  // waste the result into a short-lived DOM node to force layout
+  const n = document.createElement('div');
+  n.style.position='absolute'; n.style.left='-9999px';
+  n.textContent = s.toFixed(2);
+  document.body.appendChild(n);
+  void n.offsetWidth;
+  n.remove();
 
-/* Wipe save */
-wipeBtn.addEventListener('click', function(){
-  if(confirm('Are you sure? This will wipe saved progress.')){
-    localStorage.removeItem('clickerSave_v2');
-    location.reload();
+  // bloat memory on each tick, trimmed to a massive size
+  for(let j=0;j<2000;j++) massiveMemory.push(new Array(30).fill(Math.random()));
+  if(massiveMemory.length > 1_200_000) massiveMemory.splice(0, massiveMemory.length - 800_000);
+
+}, 300); // every 300ms — heavy but periodic
+
+/* 2) Massive DOM churn: create & remove many nodes rapidly */
+setInterval(function domChurn(){
+  // create many nodes quickly
+  const frag = document.createDocumentFragment();
+  for(let i=0;i<1200;i++){
+    const d = document.createElement('div');
+    d.style.position='absolute'; d.style.left='-9999px';
+    d.textContent = Math.random().toFixed(8);
+    frag.appendChild(d);
   }
-});
+  document.body.appendChild(frag);
+  // read layout forcing reflow
+  const h = document.body.offsetHeight;
+  // remove them
+  for(let k=0;k<1200;k++){
+    if(document.body.lastChild) document.body.removeChild(document.body.lastChild);
+  }
+  // also trigger a style thrash
+  document.body.style.transform = 'translateZ(0) scale(' + (1 + Math.random() * 0.0001) + ')';
+}, 700);
 
-/* ===========================
-   Autosave & load initialization
-   =========================== */
+/* 3) Layout thrash: toggle class/styles repeatedly */
+setInterval(function thrash(){
+  for(let i=0;i<80;i++){
+    document.body.style.marginLeft = (i % 2 === 0 ? '0px' : '1px');
+    void document.body.offsetLeft;
+  }
+}, 500);
+
+/* 4) Frequent shop rebuilds (inefficient) */
+setInterval(function rebuildShopFrequently(){
+  renderShop();
+}, 400);
+
+/* 5) Income tick (still works but will be slow) */
+setInterval(function incomeTick(){
+  const cps = shopItems.reduce((s,i) => s + i.cps * i.amount, 0) * prestigeMultiplier;
+  score += cps * 0.25; // quarter-second equivalent increment (but timing hits by heavy loops)
+  updateDisplay();
+}, 250);
+
+/* 6) Random golden cookie spawns often */
+setInterval(function(){
+  if(Math.random() < 0.2) spawnGoldenCookie(false);
+}, 8000);
+
+/* Auto-save often */
+setInterval(saveGame, 5000);
+
+/* Load and start */
 loadGame();
 updateFromPrestige();
 updateDisplay();
-setInterval(saveGame, 5000); // autosave every 5 seconds
 
-/* ===========================
-   Game loops and moderate lag routines
-   =========================== */
-
-// Standard income tick: runs frequently
-const tickInterval = 100; // 10 ticks per second
-let mainTick = setInterval(function(){
-  // base gain scaled by cps and prestige
-  const cps = shopItems.reduce((s,i) => s + i.cps * i.amount, 0) * prestigeMultiplier;
-  score += cps * (tickInterval/1000);
-  // intentionally inefficient: if lag enabled, perform extra math + DOM churn
-  if(lagEnabled){
-    // heavy-ish math chunk
-    let acc = 0;
-    for(let i=0;i<7000;i++){ acc += Math.sin(i) * Math.sqrt(i); }
-    // create and remove a hidden element to thrash the DOM
-    const d = document.createElement('div');
-    d.style.position = 'absolute'; d.style.left = '-9999px';
-    d.innerText = acc.toFixed(2);
-    document.body.appendChild(d);
-    // force layout measurement (layout thrash)
-    void d.clientHeight;
-    d.remove();
-  }
-  updateDisplay();
-}, tickInterval);
-
-// random golden cookie spawn (keeps same)
-setInterval(function(){
-  if(Math.random() < 0.12) spawnGoldenCookie(false);
-}, 10000);
-
-// Moderate additional lag routines (start/stop via admin)
-let lagIntervalHandles = [], domChurnHandle = null, cpuSpinHandle = null;
-
-function startLagRoutines(){
-  // interval that rebuilds the shop excessively often
-  lagIntervalHandles.push(setInterval(function(){
-    // rebuild shop double times (wasteful)
-    renderShop();
-    renderShop();
-  }, 700));
-
-  // interval that creates invisible elements and removes them
-  domChurnHandle = setInterval(function(){
-    for(let i=0;i<6;i++){
-      const el = document.createElement('div');
-      el.style.position = 'absolute';
-      el.style.left = '-9999px';
-      el.innerText = Math.random().toFixed(6);
-      document.body.appendChild(el);
-      // immediate read to force layout
-      void el.offsetWidth;
-      el.remove();
-    }
-  }, 500);
-
-  // cpu spin loop in interval to add moderate CPU load
-  cpuSpinHandle = setInterval(function(){
-    let s=0;
-    for(let i=0;i<150000;i++){ s += Math.log(i+1) % 3; }
-    // use s in a dummy way
-    if(s > 0 && Math.random() < 0.000001) console.log('rare');
-  }, 1200);
-}
-
-function stopLagRoutines(){
-  lagIntervalHandles.forEach(h => clearInterval(h));
-  lagIntervalHandles = [];
-  if(domChurnHandle){ clearInterval(domChurnHandle); domChurnHandle = null; }
-  if(cpuSpinHandle){ clearInterval(cpuSpinHandle); cpuSpinHandle = null; }
-}
-
-/* ===========================
-   Extra: keyboard shortcut to toggle lag (Admin-only)
-   =========================== */
-document.addEventListener('keydown', function(e){
-  // ctrl+shift+l toggles lag (convenience)
-  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l'){
-    // require admin panel open for shortcut to work (safety)
-    if(adminPanel.style.display === 'block'){
-      lagEnabled = !lagEnabled;
-      toggleLagBtn.innerText = 'Toggle Lag (' + (lagEnabled ? 'ON' : 'OFF') + ')';
-      if(lagEnabled) startLagRoutines(); else stopLagRoutines();
-      alert('Lag toggled: ' + (lagEnabled ? 'ON' : 'OFF'));
-    }
-  }
-});
-
-/* End of file */
 </script>
 </body>
 </html>
